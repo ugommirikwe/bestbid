@@ -1,0 +1,1 @@
+Import this project into Android Studio and allow gradle to build it.

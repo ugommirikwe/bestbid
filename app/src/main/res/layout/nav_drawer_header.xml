@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:orientation="vertical"
+    android:background="@color/ColorPrimary"
+    tools:showIn="@layout/contest_activity">
+
+    <ImageView
+        android:id="@+id/img_contest_view_header_logo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_action_picture"
+        android:scaleType="fitCenter"/>
+
+    <TextView
+        android:id="@+id/txv_nav_drawer_header_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:textSize="20sp"
+        android:text="Ugo Mmirikwe" />
+
+</FrameLayout>
