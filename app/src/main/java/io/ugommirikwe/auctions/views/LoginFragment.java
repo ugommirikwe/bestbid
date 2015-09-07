@@ -2,12 +2,17 @@ package io.ugommirikwe.auctions.views;
 
 import android.annotation.TargetApi;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,15 +29,21 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.ugommirikwe.auctions.R;
+import io.ugommirikwe.auctions.util.AuctionsDBContract;
 import io.ugommirikwe.auctions.util.AuctionsDbHelper;
 import rx.Observable;
 import rx.android.widget.OnTextChangeEvent;
 import rx.android.widget.WidgetObservable;
 
+import static io.ugommirikwe.auctions.util.AuctionsDBContract.*;
+
 public class LoginFragment extends Fragment {
 
     private AuctionsDbHelper mAuctionsDbHelper;
     private SQLiteDatabase mSQlLiteDatabase;
+
+    SharedPreferences prefs;
+    String prefName = "User";
 
     @Bind(R.id.txb_email_login)
     public EditText txbEmail;
@@ -67,7 +78,6 @@ public class LoginFragment extends Fragment {
         mAuctionsDbHelper = new AuctionsDbHelper(getActivity());
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void setUpSignInFormValidation() {
         final Pattern emailPattern = Pattern.compile(
                 "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
@@ -139,8 +149,54 @@ public class LoginFragment extends Fragment {
         ContentValues contentValues = new ContentValues(3);
         contentValues.put("email", txbEmail.getText().toString());
         contentValues.put("password", txbPassword.getText().toString());
-        //long insert = mSQlLiteDatabase.insert(User.TABLE_NAME, null, contentValues);
-        Snackbar.make(getView(), "Login clicked", Snackbar.LENGTH_LONG).show();
+
+        // Define a projection that specifies which columns from the database you will actually use after this query.
+        String[] projection = {
+            User._ID,
+            User.COLUMN_NAME_FULLNAME
+        };
+
+
+        String selectQuery = "SELECT  * FROM " + User.TABLE_NAME + " WHERE "
+                + User.COLUMN_NAME_EMAIL + " = '" + txbEmail.getText().toString() + "' AND "
+                + User.COLUMN_NAME_PASSWORD + " = '" + txbPassword.getText().toString() + "'";
+
+        //Cursor c = mSQlLiteDatabase.query(true, User.TABLE_NAME, projection, User.COLUMN_NAME_EMAIL + " = '" + txbEmail.getText().toString() + "'", null, null, null, null, null);
+
+        Cursor c = mSQlLiteDatabase.rawQuery(selectQuery, null);
+
+        if (c != null) {
+            c.moveToFirst();
+            int matches = c.getCount();
+            if (matches > 0) {
+                String fullname = c.getString(c.getColumnIndex(User.COLUMN_NAME_FULLNAME));
+                // Save user email in SharedPrefs
+                SharedPreferences sharedPref = getActivity().getSharedPreferences(prefName, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("user", fullname);
+                //editor.apply();
+                editor.commit();
+                c.close();
+                Snackbar.make(getView(), "Login Successful", Snackbar.LENGTH_LONG).show();
+
+                // Navigate to AuctionsActivity
+                Intent i = new Intent(getActivity(), AuctionsActivity.class);
+
+                // set the new task and clear flags
+                //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+            }
+            else {
+                Snackbar.make(getView(), "Login Failed", Snackbar.LENGTH_LONG).setAction("OK", v -> {
+                    // Clear Snackbar
+                }).show();
+            }
+        }
+        else {
+            Snackbar.make(getView(), "Database Error", Snackbar.LENGTH_LONG).setAction("OK", v -> {
+                // Clear Snackbar
+            }).show();
+        }
     }
 
     @Override

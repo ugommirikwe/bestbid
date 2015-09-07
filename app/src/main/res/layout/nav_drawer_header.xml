@@ -22,7 +22,6 @@
         android:layout_gravity="bottom"
         android:gravity="center_horizontal"
         style="@style/TextAppearance.AppCompat.Subhead"
-        android:textSize="20sp"
-        android:text="Ugo Mmirikwe" />
+        android:textSize="20sp" />
 
 </FrameLayout>

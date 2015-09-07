@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/mnu_section_1" android:checkableBehavior="single">
         <item
             android:id="@+id/mnu_my_profile"
-            android:title="My Profile"
+            android:checked="false"
             android:icon="@drawable/abc_ic_menu_copy_mtrl_am_alpha"
-            android:checked="true"/>
+            android:title="My Profile" />
         <item
             android:id="@+id/mnu_my_auctions"
-            android:title="My Auctions"
-            android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha" />
+            android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha"
+            android:title="My Auctions" />
         <item
             android:id="@+id/mnu_my_bids"
-            android:title="My Bids"
-            android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha" />
+            android:icon="@drawable/abc_ic_menu_selectall_mtrl_alpha"
+            android:title="My Bids" />
+    </group>
+
+    <!-- Creates a seperate menu section, with a horizontal divider mark -->
+    <group android:id="@+id/mnu_section_2" android:checkableBehavior="none">
+        <item
+            android:id="@+id/mnu_signout"
+            android:checked="false"
+            android:icon="@drawable/abc_ic_menu_copy_mtrl_am_alpha"
+            android:title="Sign Out" />
     </group>
 
 </menu>

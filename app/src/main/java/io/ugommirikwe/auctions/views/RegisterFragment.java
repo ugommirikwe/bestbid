@@ -2,6 +2,9 @@ package io.ugommirikwe.auctions.views;
 
 import android.annotation.TargetApi;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
@@ -36,6 +39,8 @@ public class RegisterFragment extends Fragment {
 
     private AuctionsDbHelper mAuctionsDbHelper;
     private SQLiteDatabase mSQlLiteDatabase;
+    SharedPreferences prefs;
+    String prefName = "User";
 
     @Bind(R.id.txb_fullname_register)
     public EditText txbFullName;
@@ -145,25 +150,6 @@ public class RegisterFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         mSQlLiteDatabase = mAuctionsDbHelper.getWritableDatabase();
@@ -177,23 +163,34 @@ public class RegisterFragment extends Fragment {
 
     @OnClick({R.id.btn_signup})
     public void signUpButtonClick(View btn) {
+
+        // TODO: First check that email isn't already in the database
+
         ContentValues contentValues = new ContentValues(3);
         contentValues.put("fullname", txbFullName.getText().toString());
         contentValues.put("email", txbEmail.getText().toString());
         contentValues.put("password", txbPassword.getText().toString());
         long insert = mSQlLiteDatabase.insert(User.TABLE_NAME, null, contentValues);
 
-        if (insert == 1) {
-            Snackbar.make(getView(), "Register successful", Snackbar.LENGTH_LONG)/*.setAction("OK", new View.OnClickListener() {
-                @Override public void onClick(View v) {
-                    //your action here
-                }
-            })*/.show();
+        if (insert != -1) {
+            Snackbar.make(getView(), "Signup was successful", Snackbar.LENGTH_LONG).show();
 
-            // TODO: navigate to AuctionsActivity
-        }
-        else
-            Snackbar.make(getView(), "Register failed", Snackbar.LENGTH_LONG).show();
+            // Save user's fullname in SharedPrefs
+            SharedPreferences sharedPref = getActivity().getSharedPreferences(prefName, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("user", txbFullName.getText().toString());
+            //editor.apply();
+            editor.commit();
+
+            // Navigate to AuctionsActivity: prevent back button leading back to register screen
+            Intent i = new Intent(getActivity(), AuctionsActivity.class);
+            //i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+
+        } else
+            Snackbar.make(getView(), "Signup failed with database code: " + insert, Snackbar.LENGTH_LONG).setAction("OK", v -> {
+                // Clear Snackbar
+            }).show();
     }
 
     @Override

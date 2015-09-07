@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="io.ugommirikwe.auctions.views.AuctionsListFragment">
+
+    <include
+        android:id="@+id/tlb_sales_add_new"
+        layout="@layout/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent" />
+
+    <TextView
+        android:id="@+id/txv_sales_record_subheader"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/abc_action_bar_stacked_max_height"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/abc_text_size_subhead_material"
+        android:padding="10dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="15 items sold totalling N70,250.00" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lst_sales_records"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        tools:listitem="@android:layout/contest_items_list"/>
+
+</LinearLayout>
