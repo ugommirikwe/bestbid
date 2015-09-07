@@ -24,6 +24,7 @@ public final class AuctionsDBContract {
         public static final String COLUMN_NAME_ITEM_DESCRIPTION = "item_description";
         public static final String COLUMN_NAME_ITEM_PHOTO_URI = "item_photo_uri";
         public static final String COLUMN_NAME_ITEM_MINIMUM_BID = "item_minimum_bid";
+        public static final String COLUMN_NAME_WINNING_BID = "winning_bid";
     }
 
     public static abstract class AuctionBid implements BaseColumns {

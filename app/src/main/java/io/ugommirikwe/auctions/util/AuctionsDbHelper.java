@@ -32,14 +32,16 @@ public class AuctionsDbHelper extends SQLiteOpenHelper {
                     Auction.COLUMN_NAME_ITEM_TITLE + TEXT_TYPE + COMMA_SEP +
                     Auction.COLUMN_NAME_ITEM_DESCRIPTION + TEXT_TYPE + COMMA_SEP +
                     Auction.COLUMN_NAME_ITEM_PHOTO_URI + TEXT_TYPE + COMMA_SEP +
-                    Auction.COLUMN_NAME_ITEM_MINIMUM_BID + TEXT_TYPE +
+                    Auction.COLUMN_NAME_ITEM_MINIMUM_BID + TEXT_TYPE + COMMA_SEP +
+                    Auction.COLUMN_NAME_WINNING_BID + INTEGER_TYPE +
                     " )";
     private static final String CREATE_AUCTION_BID_TABLE =
             "CREATE TABLE " + AuctionBid.TABLE_NAME + " (" +
                     AuctionBid._ID + " INTEGER PRIMARY KEY," +
-                    AuctionBid.COLUMN_NAME_AUCTION_ID + TEXT_TYPE +
+                    AuctionBid.COLUMN_NAME_AUCTION_ID + TEXT_TYPE + COMMA_SEP +
                     AuctionBid.COLUMN_NAME_BID_TIME + DATETIME_TYPE + COMMA_SEP +
-                    AuctionBid.COLUMN_NAME_BID_AMOUNT + TEXT_TYPE +
+                    AuctionBid.COLUMN_NAME_BID_AMOUNT + TEXT_TYPE + COMMA_SEP +
+                    AuctionBid.COLUMN_NAME_USER_ID + INTEGER_TYPE +
                     " )";
 
     //private static final String SQL_DELETE_ENTRIES = "DELETE";

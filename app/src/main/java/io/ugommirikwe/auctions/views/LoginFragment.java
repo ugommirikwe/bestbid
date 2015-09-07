@@ -6,7 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +18,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import butterknife.Bind;
@@ -26,78 +29,53 @@ import rx.Observable;
 import rx.android.widget.OnTextChangeEvent;
 import rx.android.widget.WidgetObservable;
 
-import static io.ugommirikwe.auctions.util.AuctionsDBContract.User;
-
-public class RegisterActivity extends BaseActivity {
+public class LoginFragment extends Fragment {
 
     private AuctionsDbHelper mAuctionsDbHelper;
     private SQLiteDatabase mSQlLiteDatabase;
 
-    @Bind(R.id.txb_fullname_register)
-    public EditText txbFullName;
-
-    @Bind(R.id.txv_fullname_validation_message)
-    public TextView txvFullNameValidation;
-
-    @Bind(R.id.txb_email_register)
+    @Bind(R.id.txb_email_login)
     public EditText txbEmail;
 
-    @Bind(R.id.txv_email_validation_message)
+    @Bind(R.id.txv_email_validation_login)
     public TextView txvEmailValidation;
 
-    @Bind(R.id.txb_password_register)
+    @Bind(R.id.txb_password_login)
     public EditText txbPassword;
 
-    @Bind(R.id.txv_password_validation_message)
+    @Bind(R.id.txv_password_validation_login)
     public TextView txvPasswordValidation;
 
-    @Bind(R.id.txb_password_retype_register)
-    public EditText txbPasswordRetype;
-
-    @Bind(R.id.txv_password_retype_validation_message)
-    public TextView txvPasswordRetypeValidation;
-
-    @Bind(R.id.btn_signup)
-    public Button btnSignUp;
+    @Bind(R.id.btn_login)
+    public Button btnLogin;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getLayoutInflater().inflate(R.layout.activity_register, (ViewGroup) findViewById(R.id.frm_view_layout));
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        ButterKnife.bind(this);
+        ButterKnife.bind(this, view);
 
         initDB();
 
-        setUpSignFormValidation();
+        setUpSignInFormValidation();
+
+        return view;
     }
 
     private void initDB() {
-        mAuctionsDbHelper = new AuctionsDbHelper(this);
+        mAuctionsDbHelper = new AuctionsDbHelper(getActivity());
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void setUpSignFormValidation() {
+    private void setUpSignInFormValidation() {
         final Pattern emailPattern = Pattern.compile(
                 "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-
-        // Set validation rule for length of full name
-        Observable<Boolean> fullNameValid = WidgetObservable.text(txbFullName)
-                .map(OnTextChangeEvent::text)
-                .map(t -> t.length() > 4);
-
-        // Run the validation
-        fullNameValid
-                .distinctUntilChanged()
-                .doOnNext(b -> txvFullNameValidation.setText(b ? "" : "Full name is required and should be more than 4 characters in length."))
-                .map(b -> b ? Color.BLACK : Color.RED)
-                .subscribe(txbFullName::setTextColor);
 
         // Validate email
         Observable<Boolean> emailValid = WidgetObservable.text(txbEmail)
                 .map(OnTextChangeEvent::text)
                 .map(t -> emailPattern.matcher(t).matches());
-
 
         emailValid
                 .distinctUntilChanged()
@@ -117,31 +95,17 @@ public class RegisterActivity extends BaseActivity {
                 .map(b -> b ? Color.BLACK : Color.RED)
                 .subscribe(txbPassword::setTextColor);
 
-        // Set validation rule to ensure retyped password matches
-        Observable<Boolean> passwordRetypeValid = WidgetObservable.text(txbPasswordRetype)
-                .map(OnTextChangeEvent::text)
-                .map(t -> Objects.equals(t.toString(), txbPassword.getText().toString()));
-
-        // Run the validation
-        passwordRetypeValid
-                .distinctUntilChanged()
-                .doOnNext(b -> txvPasswordRetypeValidation.setText(b ? "" : "Retyped password must be the same as password above."))
-                .map(b -> b ? Color.BLACK : Color.RED)
-                .subscribe(txbPasswordRetype::setTextColor);
-
         Observable<Boolean> signUpButtonEnabled =
-                Observable.combineLatest(fullNameValid, emailValid, passwordValid, passwordRetypeValid,
-                        (a, b, c, d) -> a && b && c && d);
+                Observable.combineLatest(emailValid, passwordValid, (a, b) -> a && b);
 
         signUpButtonEnabled
                 .distinctUntilChanged()
-                .subscribe(btnSignUp::setEnabled);
+                .subscribe(btnLogin::setEnabled);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -159,28 +123,33 @@ public class RegisterActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         mSQlLiteDatabase = mAuctionsDbHelper.getWritableDatabase();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         mSQlLiteDatabase.close();
     }
 
-    @OnClick({R.id.btn_signup})
-    public void signUpButtonClick(View btn) {
+    @OnClick({R.id.btn_login})
+    public void signInButtonClick(View btn) {
         ContentValues contentValues = new ContentValues(3);
-        contentValues.put("fullname", txbFullName.getText().toString());
         contentValues.put("email", txbEmail.getText().toString());
         contentValues.put("password", txbPassword.getText().toString());
-        long insert = mSQlLiteDatabase.insert(User.TABLE_NAME, null, contentValues);
+        //long insert = mSQlLiteDatabase.insert(User.TABLE_NAME, null, contentValues);
+        Snackbar.make(getView(), "Login clicked", Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    protected void onDestroy() {
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onDestroy() {
         super.onDestroy();
     }
 }

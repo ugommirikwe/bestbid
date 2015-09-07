@@ -18,7 +18,9 @@
     <TextView
         android:id="@+id/txv_email_validation_login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:textSize="8sp"
+        android:textColor="@color/error_color"/>
 
 
     <TextView
@@ -36,7 +38,9 @@
     <TextView
         android:id="@+id/txv_password_validation_login"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:textSize="8sp"
+        android:textColor="@color/error_color"/>
 
 
     <Button
@@ -44,6 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/Base.Widget.AppCompat.Button.Borderless"
-        android:text="Login"/>
+        android:text="Login"
+        android:enabled="false"/>
 
 </LinearLayout>
